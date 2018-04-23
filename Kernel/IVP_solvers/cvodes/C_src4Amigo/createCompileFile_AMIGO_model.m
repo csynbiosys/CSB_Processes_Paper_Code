@@ -82,8 +82,10 @@ end
 str='';
 include_folder=fullfile(path_amigo,'Kernel','IVP_solvers','cvodes','C_src4Amigo','include');
 
-if (strcmp(version('-release'),'2017b'))
-    if(strcmp(computer,'PCWIN'))
+%if (strcmp(version('-release'),'2017b'))
+ ver=version('-release');
+  if (str2num(ver(1:4))>2017) % versions from 2017 and up
+  if(strcmp(computer,'PCWIN'))
         str=sprintf('mex -compatibleArrayDims %s -I%s -I%s -L%s -L%s -lmwblas -lmwlapack -l%s...\n',flags,fullfile(include_folder,'include_amigo'),fullfile(include_folder,'include_cvodes'),fullfile(matlabroot,'bin','win32'),lapacklib_dir,libutlib);
 
     elseif (strcmp(computer,'PCWIN64'))
