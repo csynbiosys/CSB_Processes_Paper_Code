@@ -48,13 +48,12 @@ end
 % PARAMETERS TO BE CONSIDERED IN THE ANALYSIS
 %============================================
 
-%inputs.PEsol.id_global_theta=inputs.model.par_names([true(1,8),false],:);
-inputs.PEsol.id_global_theta='all';
+inputs.PEsol.id_global_theta=inputs.model.par_names([true(1,8),false],:);
 
-%inputs.PEsol.global_theta_guess=inputs.model.par([true(1,8),false]);
-inputs.PEsol.global_theta_guess=inputs.model.par;
-inputs.PEsol.global_theta_max=[0.4950,0.4950,4.9,10,0.23,6.8067,0.2449,0.0217,1000];
-inputs.PEsol.global_theta_min=[3.88e-5,3.88e-2,0.5,2,7.7e-3,0.2433,5.98e-5,0.012,10];
+
+inputs.PEsol.global_theta_guess=inputs.model.par([true(1,8),false]);
+inputs.PEsol.global_theta_max=[0.4950,0.4950,4.9,10,0.23,6.8067,0.2449,0.0217];
+inputs.PEsol.global_theta_min=[3.88e-5,3.88e-2,0.5,2,7.7e-3,0.2433,5.98e-5,0.012];
 
 
 %============================================
@@ -70,11 +69,11 @@ input.plotd.plotlevel='min';
 %================================
 AMIGO_Prep(inputs);
 
-n=1;%00;
+n=100;
 recL=zeros(n,1);
 recG=recL;
 
-%   inputs.plotd.plotlevel='noplot';
+inputs.plotd.plotlevel='noplot';
 for i=1:n
     tic;
     AMIGO_LRank(inputs);
@@ -83,6 +82,6 @@ for i=1:n
     AMIGO_GRank(inputs);
     recG(i)=toc;
 end
-save('rec20183.mat','recL','recG');
+save('rec20182.mat','recL','recG');
 
 return;

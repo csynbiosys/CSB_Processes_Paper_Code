@@ -21,7 +21,7 @@ Cit_foldedP = (alpha2*Cit_mrna)/(Kf+d2);
 
 Cit_fluo    = (Kf*Cit_foldedP)/d2;
 
-Cit_AU      = Cit_fluo/sc_molec;
+Cit_AU      = sc_molec*Cit_fluo;
 
 res = [Cit_mrna,Cit_foldedP,Cit_fluo,Cit_AU];
 
