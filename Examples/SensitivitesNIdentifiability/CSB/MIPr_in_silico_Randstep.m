@@ -9,20 +9,20 @@ inputs.pathd.results_folder = strcat('MIP_rep',datestr(now,'yyyy-mm-dd-HHMMSS'))
 inputs.pathd.short_name     = 'MIP';
 
 % Read the model into the model variable
-M3D_load_model;
-%MIP_with_scaling_factor;
+%M3D_load_model;
+MIP_with_scaling_factor;
 
 % Compile the model
 inputs.model = model;
 clear model;
-y0=M3D_steady_state(inputs.model.par, 0);
+y0=M3D_steady_state2(inputs.model.par, 0);
 
 inputs.pathd.runident       = 'initial_setup';
 
 AMIGO_Prep(inputs);
 
 % Fixed parts of the experiment
-duration = 3000;     % Duration of the experiment in second
+duration = 3000;     % Duration of the experiment in minutes
 inputs.exps.n_exp=10;
 step=150;
 sample=5;
@@ -32,8 +32,8 @@ ITPGmax=10;
 for iexp=1:inputs.exps.n_exp
     inputs.exps.n_obs{iexp}=1;                                     % Number of observables per experiment
     inputs.exps.obs_names{iexp}=char('Fluorescence');                 % Name of the observables
-    %inputs.exps.obs{iexp}=char('Fluorescence=Cit_AU');          % Observation function
-    inputs.exps.obs{iexp}=char('Fluorescence=Cit_fluo');          % Observation function
+    inputs.exps.obs{iexp}=char('Fluorescence=Cit_AU');          % Observation function
+    %inputs.exps.obs{iexp}=char('Fluorescence=Cit_fluo');          % Observation function
     inputs.exps.exp_y0{iexp}=y0;
     
     inputs.exps.t_f{iexp}=duration;                % Experiment duration
@@ -47,7 +47,7 @@ for iexp=1:inputs.exps.n_exp
     
     inputs.exps.data_type = 'pseudo';
     inputs.exps.noise_type = 'homo_var';
-    inputs.exps.std_dev{iexp} = 0.0;%5;
+    inputs.exps.std_dev{iexp} = 0.05;
 end
 
 
