@@ -1,4 +1,4 @@
-function flag = AMIGO_gen_obs_sens(inputs)
+function flag = AMIGO_gen_obs_sens(inputs,results)
 % AMIGO_gen_obs_sens: Generates necessary file and functions to compute the
 % observables' sensitivity in general. The normal observation function is
 % faster and can be used if the observables are linear functions of the

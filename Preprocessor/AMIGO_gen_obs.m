@@ -101,7 +101,7 @@ if inputs.pathd.force_gen_obs
     rehash;
     
     if inputs.exps.NLObs
-        flag = AMIGO_gen_obs_sens(inputs);
+        flag = AMIGO_gen_obs_sens(inputs,results);
         rehash;
     end
 end
