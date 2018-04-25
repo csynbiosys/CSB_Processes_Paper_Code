@@ -16,7 +16,7 @@ if nargin<5 || isempty(dfdinp_flag)
 end
 % create symbolic parameter variables
 par = cellstr(inputs.model.par_names);
-parS = sym(par);
+parS = str2sym(par);
 n_pars = length(parS);
 
 %---- separate the algebraic equations from the ODE equations ------------
@@ -59,14 +59,14 @@ if n_alg
     inputs.model.algeqns = alg_eqns; % save the algebraic parts of the eqns
     inputs.model.algvarnames = alg_names;
     
-    algS = sym([alg_names{:}]');
+    algS = str2sym([alg_names{:}]');
     % create symbolic state and algebraic equations
     for i = 1: n_alg
-        falg(i,1) = sym(alg_eqns{i});
+        falg(i,1) = str2sym(alg_eqns{i});
     end
 else
-    algS = sym('');
-    falg = sym('');
+    algS = str2sym('');
+    falg = str2sym('');
 end
 
 % eliminate if the algebraic expressions contains algebraic variables on
@@ -75,7 +75,7 @@ end
 tmp = falg;
 success = 0;
 for i = 1:3  % max 3 levels of embedding...
-    tmp2 = subs(tmp,algS,falg,0);
+    tmp2 = subs(tmp,algS,falg);
     if all(tmp2 == tmp)
         % ready.
         success = 1;
@@ -121,22 +121,22 @@ end
 % reorder by these.
 ode_names = ode_names(rank);
 ode_eqns = ode_eqns(rank);
-odeS = sym([ode_names]);
+odeS = str2sym([ode_names]);
 
 % create symbolic state variables using the left hand side of the ODEs
 for i = 1: n_ode
-    fsys(i,1) = sym(ode_eqns{i});
-    stS(i,1) = sym(ode_names{i}(2:end));
+    fsys(i,1) = str2sym(ode_eqns{i});
+    stS(i,1) = str2sym(ode_names{i}(2:end));
 end
 
 % it should not be, but try to resolve seemingly differential algebraic
 % equations: when the right hand side of the ODEs depends on dx.
-fsys = subs(fsys,odeS,fsys,0);
+fsys = subs(fsys,odeS,fsys);
 
 
 % -----  Compute the Jacobians --------------------------------------------
 fprintf('Constructing symbolic Jacobians...')
-fsys = subs(fsys,algS,falg,0);
+fsys = subs(fsys,algS,falg);
 if dfdx_flag
     dfdx =  jacobian(fsys,stS) + jacobian(fsys,algS)*jacobian(falg,stS);
 else
@@ -175,10 +175,10 @@ if dobsdx_flag
                 obs_eqns{i,1}  = obs_splitted{i}(2);
             end
             
-            obsS = sym([obs_names{:}]');
+            obsS = str2sym([obs_names{:}]');
             % create symbolic state and algebraic equations
             for i = 1: n_obs
-                fobs(i,1) = sym(regexprep(obs_eqns{i},'\.',''));
+                fobs(i,1) = str2sym(regexprep(obs_eqns{i},'\.',''));
             end
             
             % -----  Compute the Jacobian of Observables wrt States  ------------------
@@ -204,7 +204,7 @@ if dfdinp_flag
             inp_names{i,1} = inputs.model.stimulus_names(i,:);
         end
         
-        inpS = sym(inp_names);
+        inpS = str2sym(inp_names);
         
         
         % -----  Compute the Jacobian of Observables wrt States  ------------------
