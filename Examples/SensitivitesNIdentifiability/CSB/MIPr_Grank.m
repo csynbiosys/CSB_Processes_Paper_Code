@@ -19,7 +19,7 @@ inputs.pathd.runident       = 'initial_setup';
 
 % Fixed parts of the experiment
 duration = 3000*60;     % Duration of the experiment in second
-inputs.exps.n_exp=length(data.input);
+inputs.exps.n_exp=5;%length(data.input);
 step=150*60;
 sample=5*60;
 ITPGmax=10;
@@ -70,11 +70,12 @@ input.plotd.plotlevel='min';
 %================================
 AMIGO_Prep(inputs);
 
-n=1;%00;
+AMIGO_Sim
+n=0;%10;
 recL=zeros(n,1);
 recG=recL;
 
-%   inputs.plotd.plotlevel='noplot';
+inputs.plotd.plotlevel='noplot';
 for i=1:n
     tic;
     AMIGO_LRank(inputs);
@@ -83,6 +84,6 @@ for i=1:n
     AMIGO_GRank(inputs);
     recG(i)=toc;
 end
-save('rec20183.mat','recL','recG');
+save('rec2018f.mat','recL','recG');
 
 return;
