@@ -59,7 +59,7 @@ MaxNumberOfSteps: 1e+06
 		Experiment 8: 
 			exp_y0=[7.139e-02  1.726e+01  6.513e+01  2.326e+00  ]
 		Experiment 9: 
-			exp_y0=[7.139e-02  1.726e+01  6.513e+01  2.326e+00  ]
+			exp_y0=[7.139e-02  1.726e+01  4.513e+01  2.326e+00  ]
 		Experiment 10: 
 			exp_y0=[7.139e-02  1.726e+01  6.513e+01  2.326e+00  ]
 

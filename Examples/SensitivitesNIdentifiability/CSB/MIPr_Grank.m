@@ -5,23 +5,26 @@
 
 clear model exps sim inputs data;
 
+load('M3DrandomStep2.mat','inputs');
+U=inputs.exps.u;
+clear inputs;
+
 inputs.pathd.results_folder = strcat('MIP_rep',datestr(now,'yyyy-mm-dd-HHMMSS'));
 inputs.pathd.short_name     = 'MIP';
 
 % Read the model into the model variable
 %M3D_load_model;
 MIP_with_scaling_factor;
-load('M3DrandomStep.mat');
 % Compile the model
 inputs.model = model;
 clear model;
 inputs.pathd.runident       = 'initial_setup';
 
 % Fixed parts of the experiment
-duration = 3000*60;     % Duration of the experiment in second
+duration = 3000;     % Duration of the experiment in second
 inputs.exps.n_exp=5;%length(data.input);
-step=150*60;
-sample=5*60;
+step=150;
+sample=5;
 ITPGmax=10;
 
 for iexp=1:inputs.exps.n_exp
@@ -36,14 +39,14 @@ for iexp=1:inputs.exps.n_exp
     inputs.exps.n_s{iexp}=length(inputs.exps.t_s{iexp});
     inputs.exps.u_interp{iexp} = 'step';
     inputs.exps.n_steps{iexp}=ceil(duration/step);
-    inputs.exps.u{iexp}=data.input{iexp};
     inputs.exps.t_con{iexp} = 0:step:duration;
     
     inputs.exps.data_type = 'pseudo';
-    inputs.exps.noise_type = 'homo_var';
+    inputs.exps.noise_type = 'hetero';
     inputs.exps.std_dev{iexp} = 0.05;
 end
-
+inputs.exps.u=U;
+clear U;
 %============================================
 % PARAMETERS TO BE CONSIDERED IN THE ANALYSIS
 %============================================
@@ -70,12 +73,11 @@ input.plotd.plotlevel='min';
 %================================
 AMIGO_Prep(inputs);
 
-AMIGO_Sim
-n=0;%10;
+n=1;%10;
 recL=zeros(n,1);
 recG=recL;
 
-inputs.plotd.plotlevel='noplot';
+%inputs.plotd.plotlevel='noplot';
 for i=1:n
     tic;
     AMIGO_LRank(inputs);
