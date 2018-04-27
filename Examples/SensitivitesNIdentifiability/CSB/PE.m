@@ -82,7 +82,7 @@ AMIGO_Prep(inputs)      % Calls the task for pre-processing
 % ANALYTICAL COMPUTATION RELATED DATA
 %====================================
 inputs.model.AMIGOsensrhs = 1;      % compute the right hand side of the sensitivity eqs analytically
-inputs.exps.NLObs = 1;           % compute the Jacobian of the nonlinear observation function.
+inputs.exps.NLObs = 0;           % compute the Jacobian of the nonlinear observation function.
 
 
 %==================================
@@ -110,14 +110,13 @@ inputs.ivpsol.atol=1.0e-8;
 
 inputs.plotd.plotlevel = 'full';
 inputs.nlpsol.nlpsolver = 'eSS';
-inputs.nlpsol.eSS.local.solver = 'lsqnonlin'; %'nl2sol';
-inputs.nlpsol.eSS.local.finish = 'lsqnonlin'; %'nl2sol';
+inputs.nlpsol.eSS.local.solver ='nl2sol'; % 'lsqnonlin';
+inputs.nlpsol.eSS.local.finish ='nl2sol'; % 'lsqnonlin';
 inputs.nlpsol.eSS.maxeval = 20000;
 inputs.nlpsol.eSS.maxtime = 3000;
 inputs.rid.conf_ntrials = 500;
 
 % Run parameter estimation
-AMIGO_Prep(inputs);
 tic;
 AMIGO_PE(inputs);
 time=toc;

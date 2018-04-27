@@ -1,4 +1,7 @@
 clear model exps sim inputs data;
+load('M3DrandomStep2.mat','inputs');
+U=inputs.exps.u;
+clear inputs;
 
 inputs.pathd.results_folder = strcat('MIP_rep',datestr(now,'yyyy-mm-dd-HHMMSS'));
 inputs.pathd.short_name     = 'MIP';
@@ -6,17 +9,17 @@ inputs.pathd.short_name     = 'MIP';
 % Read the model into the model variable
 %M3D_load_model;
 MIP_with_scaling_factor;
-load('M3DrandomStep.mat');
+
 % Compile the model
 inputs.model = model;
 clear model;
 inputs.pathd.runident       = 'initial_setup';
 
 % Fixed parts of the experiment
-duration = 3000*60;     % Duration of the experiment in second
-inputs.exps.n_exp=length(data.input);
-step=150*60;
-sample=5*60;
+duration = 3000;     % Duration of the experiment in second
+inputs.exps.n_exp=5;
+step=150;
+sample=5;
 ITPGmax=10;
 
 for iexp=1:inputs.exps.n_exp
@@ -31,14 +34,19 @@ for iexp=1:inputs.exps.n_exp
     inputs.exps.n_s{iexp}=length(inputs.exps.t_s{iexp});
     inputs.exps.u_interp{iexp} = 'step';
     inputs.exps.n_steps{iexp}=ceil(duration/step);
-    inputs.exps.u{iexp}=data.input{iexp};
     inputs.exps.t_con{iexp} = 0:step:duration;
     
     inputs.exps.data_type = 'pseudo';
-    inputs.exps.noise_type = 'homo_var';
+    inputs.exps.noise_type = 'hetero';
     inputs.exps.std_dev{iexp} = 0.05;
 end
+inputs.exps.u=U;
+clear U;
 
+load('M3DrandomStep2.mat','results');
+inputs.exps.exp_data=results.sim.exp_data;
+inputs.exps.error_data=results.sim.error_data;
+clear results;
 % GLOBAL UNKNOWNS (SAME VALUE FOR ALL EXPERIMENTS)
 
 include=true(1,inputs.model.n_par);
@@ -79,12 +87,12 @@ inputs.nlpsol.nlpsolver='eSS';
 inputs.nlpsol.eSS.maxeval = 2000;
 inputs.nlpsol.eSS.maxtime = 600;
 inputs.nlpsol.eSS.log_var = 1:8;
-inputs.nlpsol.eSS.local.solver = 'lsqnonlin';  % nl2sol not yet installed on my mac
-inputs.nlpsol.eSS.local.finish = 'lsqnonlin';  % nl2sol not yet installed on my mac
-inputs.rid.conf_ntrials=10000;
+inputs.nlpsol.eSS.local.solver = 'nl2sol'; %'lsqnonlin';  % nl2sol not yet installed on my mac
+inputs.nlpsol.eSS.local.finish = 'nl2sol'; %'lsqnonlin';  %   nl2sol not yet installed on my mac
+inputs.rid.conf_ntrials=500;
 
 AMIGO_Prep(inputs);
-inputs.plotd.plotlevel='noplot';
+%inputs.plotd.plotlevel='noplot';
 tic;
 AMIGO_RIdent(inputs);
 time=toc;
