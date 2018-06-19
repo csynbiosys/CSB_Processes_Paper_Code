@@ -1,0 +1,23 @@
+Error using savefig (line 43)
+H must be an array of handles to valid figures.
+
+Error in saveasfig (line 6)
+savefig(h, name);
+
+Error in saveas (line 140)
+    feval( ['saveas' format], h, name )
+
+Error in AMIGO_plot_conv_curve (line 57)
+                saveas(gcf, [inputs.pathd.conv_curve_path '_CPU'], 'fig')
+
+Error in AMIGO_post_plot_PE (line 59)
+        AMIGO_plot_conv_curve
+
+Error in AMIGO_PE (line 331)
+        AMIGO_post_plot_PE(inputs,results,privstruct);
+
+Error in fit_M (line 161)
+    results = AMIGO_PE(inputs);
+
+Error in Run_M_fit2 (line 47)
+            out = fit_M(epccOutputResultFileNameBase,epcc_exps,global_theta_guess);
