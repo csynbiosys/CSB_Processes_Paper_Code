@@ -1,4 +1,3 @@
-ed
 % RUN Arabidopsis circadian clock optimal design of experiments
 
 clear all;

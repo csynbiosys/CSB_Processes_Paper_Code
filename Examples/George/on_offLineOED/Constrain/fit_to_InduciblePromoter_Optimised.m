@@ -1,4 +1,4 @@
-function [out]=fit_to_InduciblePromoter_OptimisedeSS(epccOutputResultFileNameBase,epccNumLoops,stepd,epcc_exps,global_theta_guess)
+function [out]=fit_to_InduciblePromoter_Optimised(epccOutputResultFileNameBase,epccNumLoops,stepd,epcc_exps,global_theta_guess)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % In silico experiment OID script - runs PE, OED, mock experiment
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -37,7 +37,7 @@ global_theta_max = [0.4950,0.4950,4.9,10,0.23,6.8067,0.2449,0.0217];       % Max
 global_theta_min = [3.88e-5,3.88e-2,0.5,2,7.7e-3,0.2433,5.98e-5,0.012];    % Minimum allowed values for the parameters
 %giving the theta guess here...
 global_theta_guess = [0.0164186333380725 0.291556643109224 1.71763487775568 5.14394334860864 0.229999999999978 6.63776658557266 0.00575139649497780 0.0216999999961899];
-global_theta_guess = global_theta_guess';
+
 global_theta_guess = global_theta_guess';
 
 % Specify the parameters to be calibrated.
@@ -73,7 +73,7 @@ for i=1:numLoops
     % We get this state by simulating the model using the current best theta
     % for the duration for which we have designed input.
     if exps.n_exp == 0
-        oid_y0 = [y0];                        % Add the state variable required for the constraint
+        oid_y0 = [y0 0];                        % Add the state variable required for the constraint
         best_global_theta = global_theta_guess;
     else
         % Simulate the experiment without noise to find end state
@@ -136,13 +136,13 @@ for i=1:numLoops
     inputs.exps.std_dev{iexp}=[0.05];
     inputs.OEDsol.OEDcost_type='Dopt';
     
-%     
-%     % final time constraint
-%     for iexp=1:inputs.exps.n_exp
-%         inputs.exps.n_const_ineq_tf{iexp}=1;
-%         inputs.exps.const_ineq_tf{iexp}=char('cviol');     % c<=0
-%     end
-%     inputs.exps.ineq_const_max_viol=1.0e-5;
+    
+    % final time constraint
+    for iexp=1:inputs.exps.n_exp
+        inputs.exps.n_const_ineq_tf{iexp}=1;
+        inputs.exps.const_ineq_tf{iexp}=char('cviol');     % c<=0
+    end
+    inputs.exps.ineq_const_max_viol=1.0e-5;
     
     
     % SIMULATION
@@ -152,22 +152,33 @@ for i=1:numLoops
     inputs.ivpsol.atol=1.0D-8;
     
     % OPTIMIZATION
-    %oidDuration=600;
-    inputs.nlpsol.nlpsolver='eSS';
-    inputs.nlpsol.eSS.maxeval = 5e4;
-    inputs.nlpsol.eSS.maxtime = 6e3;
-    inputs.nlpsol.eSS.local.solver = 'fmincon'; % note that, in order to handle constraints, an SQP approach is required (e.g. fminsearch cannot be used).
-    inputs.nlpsol.eSS.local.finish = 'fmincon';%fmincon';
+    inputs.nlpsol.nlpsolver='de';                                           % Differential evolution
+    inputs.nlpsol.DE.NP = max([100, 10*(2*inputs.exps.n_steps{iexp}-1)]);       % NP is the number of population members, usually greater than 10*number of decision variables
+    inputs.nlpsol.DE.itermax = round((300*1e3)/inputs.nlpsol.DE.NP);        % maximum number of iterations ('generations')
+    inputs.nlpsol.DE.cvarmax = 1e-5;                                        % cvarmax: maximum variance for a population at convergence
+    inputs.nlpsol.DE.F = 0.5;                                               % F: DE-stepsize [0,2]
+    inputs.nlpsol.DE.CR = 0.3;                                              % CR: crossover probability constant [0,1]
+    inputs.nlpsol.DE.strategy =3;
+    % strategy
+    %                1 --> DE/best/1/exp
+    %                2 --> DE/rand/1/exp
+    %                3 --> DE/rand-to-best/1/exp
+    %                4 --> DE/best/2/exp
+    %                5 --> DE/rand/2/exp
+    %                6 --> DE/best/1/bin
+    %                7 --> DE/rand/1/bin
+    %                8 --> DE/rand-to-best/1/bin
+    %                9 --> DE/best/2/bin
     
-    inputs.nlpsol.eSS.local.nl2sol.maxiter  =     300;     % max number of iteration
-    inputs.nlpsol.eSS.local.nl2sol.maxfeval =     500;     % max number of function evaluation
-    inputs.nlpsol.eSS.log_var=1:inputs.exps.n_steps{iexp};
+    %               else DE/rand/2/bin
+    inputs.nlpsol.DE.refresh=2;  % intermediate output will be produced after "refresh" iterations. No intermediate output will be produced if refresh is < 1
     inputs.plotd.plotlevel='noplot';
     
     inputs.pathd.results_folder = results_folder;
     inputs.pathd.short_name     = short_name;
     inputs.pathd.runident       = strcat('oed-',int2str(i));
-        
+    
+    
     oed_start = now;
     
     results = AMIGO_OED(inputs);
@@ -186,7 +197,7 @@ for i=1:numLoops
     newExps.n_obs{1}=1;
     newExps.obs_names{1}=char('Fluorescence');
     newExps.obs{1}= char('Fluorescence = Cit_fluo');
-    newExps.exp_y0{1}= [y0];
+    newExps.exp_y0{1}= [y0 0];
     
     newExps.t_f{1}=i*duration;
     newExps.n_s{1}=(i*duration)/5 + 1;

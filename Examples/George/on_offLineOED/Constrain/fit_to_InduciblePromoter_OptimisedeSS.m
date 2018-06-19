@@ -37,7 +37,7 @@ global_theta_max = [0.4950,0.4950,4.9,10,0.23,6.8067,0.2449,0.0217];       % Max
 global_theta_min = [3.88e-5,3.88e-2,0.5,2,7.7e-3,0.2433,5.98e-5,0.012];    % Minimum allowed values for the parameters
 %giving the theta guess here...
 global_theta_guess = [0.0164186333380725 0.291556643109224 1.71763487775568 5.14394334860864 0.229999999999978 6.63776658557266 0.00575139649497780 0.0216999999961899];
-global_theta_guess = global_theta_guess';
+
 global_theta_guess = global_theta_guess';
 
 % Specify the parameters to be calibrated.
@@ -73,7 +73,7 @@ for i=1:numLoops
     % We get this state by simulating the model using the current best theta
     % for the duration for which we have designed input.
     if exps.n_exp == 0
-        oid_y0 = [y0];                        % Add the state variable required for the constraint
+        oid_y0 = [y0 0];                        % Add the state variable required for the constraint
         best_global_theta = global_theta_guess;
     else
         % Simulate the experiment without noise to find end state
@@ -136,13 +136,13 @@ for i=1:numLoops
     inputs.exps.std_dev{iexp}=[0.05];
     inputs.OEDsol.OEDcost_type='Dopt';
     
-%     
-%     % final time constraint
-%     for iexp=1:inputs.exps.n_exp
-%         inputs.exps.n_const_ineq_tf{iexp}=1;
-%         inputs.exps.const_ineq_tf{iexp}=char('cviol');     % c<=0
-%     end
-%     inputs.exps.ineq_const_max_viol=1.0e-5;
+    
+    % final time constraint
+    for iexp=1:inputs.exps.n_exp
+        inputs.exps.n_const_ineq_tf{iexp}=1;
+        inputs.exps.const_ineq_tf{iexp}=char('cviol');     % c<=0
+    end
+    inputs.exps.ineq_const_max_viol=1.0e-5;
     
     
     % SIMULATION
@@ -151,7 +151,7 @@ for i=1:numLoops
     inputs.ivpsol.rtol=1.0D-8;                            % [] IVP solver integration tolerances
     inputs.ivpsol.atol=1.0D-8;
     
-    % OPTIMIZATION
+     % OPTIMIZATION
     %oidDuration=600;
     inputs.nlpsol.nlpsolver='eSS';
     inputs.nlpsol.eSS.maxeval = 5e4;
@@ -186,7 +186,7 @@ for i=1:numLoops
     newExps.n_obs{1}=1;
     newExps.obs_names{1}=char('Fluorescence');
     newExps.obs{1}= char('Fluorescence = Cit_fluo');
-    newExps.exp_y0{1}= [y0];
+    newExps.exp_y0{1}= [y0 0];
     
     newExps.t_f{1}=i*duration;
     newExps.n_s{1}=(i*duration)/5 + 1;
