@@ -1,4 +1,4 @@
-%list of the data to analyze
+%list of the data to analyse
 filelist={'Step.mat','Pulse.mat','Random.mat'};
 %alpha level
 alpha=0.1;
@@ -52,6 +52,9 @@ for file=filelist
         plot(ax.XLim,[trueValues(paramIndex),trueValues(paramIndex)],'r-');
         legend('90% High Density Interval','Mean Trajectory',...
             'Lower Boundary','Upper Boundary','True Value');
+        xlabel('Iteration');
+        ylabel('Parameter Value');
+        set(ax,'FontSize',14);
         %rescale of the boundaries of the parameters are given.
         %and save the figure.
         if (exist('global_theta_min','var')*exist('global_theta_max','var')==1)
@@ -60,14 +63,14 @@ for file=filelist
                 [file{1}(1:end-4),'-',parNames(paramIndex,:),', alpha=',...
                 num2str(alpha),'), fixed scale']});
             savefig([file{1}(1:end-4),'-',parNames(paramIndex,:),...
-            '(alpha=',num2str(alpha),', fixed scale).fig']);
+                '(alpha=',num2str(alpha),', fixed scale).fig']);
         else
             title({'Credible Interval (Highest Posterior Density Region)';
                 [file{1}(1:end-4),'-',parNames(paramIndex,:),' (alpha=',...
                 num2str(alpha),'), auto scale']});
             savefig([file{1}(1:end-4),'-',parNames(paramIndex,:),...
-            '(alpha=',num2str(alpha),', auto scale).fig']);
-        end        
+                '(alpha=',num2str(alpha),', auto scale).fig']);
+        end
     end
     %save the data
     save([file{1}(1:end-4),'CIdata alpha=',num2str(alpha),'.mat'],'param');

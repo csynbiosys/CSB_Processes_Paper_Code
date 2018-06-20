@@ -38,16 +38,19 @@ if ~isempty(varargin)
     histogram(bsresult,1e3);
     hold on;
     ax=gca;
-    plot(ax.XLim,[Ns,Ns],'b-');
+    plot(ax.XLim,[Ns,Ns],'b-','LineWidth',1);
     plot([average,average],ax.YLim,'r-','LineWidth',2);
-    plot([lb,lb],ax.YLim,'m-');
-    plot([ub,ub],ax.YLim,'m-');
+    plot([lb,lb],ax.YLim,'m-','LineWidth',1);
+    plot([ub,ub],ax.YLim,'m-','LineWidth',1);
     title({'Credible Interval (Highest Posterior Density Region)';
         ['(with Alpha=',num2str(alpha),')']});
-    legend('Bootstrapped Results','Probability Limit',...
+    legend('Bootstrapped Results','Frequency Limit',...
         ['Mean = ',num2str(average,'%10.3e')],...
-        ['lower Boundary = ',num2str(lb,'%10.3e')],...
+        ['Lower Boundary = ',num2str(lb,'%10.3e')],...
         ['Upper Boundary = ',num2str(ub,'%10.3e')]);
+    xlabel('Parameter Values');
+    ylabel('Frequency');
+    set(ax,'FontSize',14);
     savefig(varargin{1});
     hold off;
 end
