@@ -47,17 +47,20 @@ for file=filelist
         plot(param.mean(:,paramIndex),'k-o');
         plot(param.min(:,paramIndex),'m-*');
         plot(param.max(:,paramIndex),'m-+');
-        %true value
-        ax=gca;
-        plot(ax.XLim,[trueValues(paramIndex),trueValues(paramIndex)],'r-');
-        legend('90% High Density Interval','Mean Trajectory',...
-            'Lower Boundary','Upper Boundary','True Value');
-        xlabel('Iteration');
-        ylabel('Parameter Value');
-        set(ax,'FontSize',14);
-        %rescale of the boundaries of the parameters are given.
-        %and save the figure.
+        
         if (exist('global_theta_min','var')*exist('global_theta_max','var')==1)
+            ax=gca;
+            %true value
+            plot(ax.XLim,[trueValues(paramIndex),trueValues(paramIndex)],'r-');
+            legend('90% High Density Interval','Mean Trajectory',...
+                'Lower Boundary','Upper Boundary','True Value');
+            xlabel('Iteration');
+            ylabel('Parameter Value');
+            set(ax,'FontSize',14);
+            ax.XLim=[1,10];
+            xticks(1:10);
+            %rescale of the boundaries of the parameters are given.
+            %and save the figure.
             ax.YLim=[global_theta_min(paramIndex),global_theta_max(paramIndex)];
             title({'Credible Interval (Highest Posterior Density Region)';
                 [file{1}(1:end-4),'-',parNames(paramIndex,:),', alpha=',...
@@ -65,12 +68,25 @@ for file=filelist
             savefig([file{1}(1:end-4),'-',parNames(paramIndex,:),...
                 '(alpha=',num2str(alpha),', fixed scale).fig']);
         else
+            ax=gca;
+            %true value
+            plot(ax.XLim,[trueValues(paramIndex),trueValues(paramIndex)],'r-');
+            legend('90% High Density Interval','Mean Trajectory',...
+                'Lower Boundary','Upper Boundary','True Value');
+            xlabel('Iteration');
+            ylabel('Parameter Value');
+            set(ax,'FontSize',14);
+            ax.XLim=[1,10];
+            xticks(1:10);
+            %rescale of the boundaries of the parameters are given.
+            %and save the figure.
             title({'Credible Interval (Highest Posterior Density Region)';
                 [file{1}(1:end-4),'-',parNames(paramIndex,:),' (alpha=',...
                 num2str(alpha),'), auto scale']});
             savefig([file{1}(1:end-4),'-',parNames(paramIndex,:),...
                 '(alpha=',num2str(alpha),', auto scale).fig']);
         end
+        close(gcf);
     end
     %save the data
     save([file{1}(1:end-4),'CIdata alpha=',num2str(alpha),'.mat'],'param');
