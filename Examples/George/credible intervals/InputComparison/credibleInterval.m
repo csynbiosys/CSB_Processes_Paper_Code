@@ -10,6 +10,7 @@ bsCount=1e5;
 %bootstrap sampling, using the parallel pool if it is already activated
 bsOptions.UseParllel=true;
 bsresult=bootstrp(bsCount,@mean,data,'Options',bsOptions);
+size(bsresult,2)
 
 %count with 1000 intervals
 [N,edges] = histcounts(bsresult,1e3);

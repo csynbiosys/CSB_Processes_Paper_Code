@@ -1,46 +1,44 @@
-function [average,lb,ub,all] = credibleInterval2(data,alpha,varargin)
+function [average,lb,ub,all] = credibleInterval2...
+    (data,alpha,numInterval,varargin)
 %generate the credible interval (Highest Posterior Density Region)based on
 %the given data and alpha value. The last parameter is the name of the
 %figure file, if the user want to have a record of this.
 
-%number of bootstrap samples to acquire a smooth curve with 1000 intervals,
-%I choose 1e5 samples
-bsCount=1e5;
-
-%bootstrap sampling, using the parallel pool if it is already activated
-bsOptions.UseParllel=true;
-bsresult=bootstrp(bsCount,@mean,data,'Options',bsOptions);
+mind=min(data);
+maxd=max(data);
+d=(maxd-mind)/(numInterval);
 
 %count with 1000 intervals
-[N,edges] = histcounts(bsresult,1e3);
+x=linspace(mind,maxd,numInterval+1);
+p=ksdensity(data,x,'Bandwidth',d);
+p=p/sum(p);
 
-%find the frequency (Ns) coreeponds to the given alpha value.
-di=edges(2)-edges(1);
-[sorted,map]=sort(N,'descend');
-edges=edges(map);
+[sorted,map]=sort(p,'descend');
+xt=x(map);
+all=xt(cumsum(sorted)<=(1-alpha));
 
 %variable 'all' saves all the regions with the frequency larger than Ns.
 %e.g. if the region is [0.1,0.2],[0.2,0.3],[0.4,0.5], all would be:
 %all=[0.1,0.2,0.4]
-all=edges(cumsum(sorted)<=bsCount*(1-alpha));
-Ns=sorted(length(all));
+Ps=sorted(length(all));
 all=sort(all);
 lb=all(1);
-ub=all(end)+di;
+ub=all(end);
 average=mean(data);
 
 %if there is a gap in the region as wide as 5 intervals, send out a warning
-if (max(diff(all))/di>5)
-    warning('There is at least one significant gap in the region.');
+if (max(diff(all))>2*d)
+    warning('There is at least one gap in the region.');
 end
 
 %draw the figure and save it if the user provide a file name.
 if ~isempty(varargin)
     figure();
-    histogram(bsresult,1e3);
+    histogram(data,numInterval);
     hold on;
+    plot(x,p*length(data));
     ax=gca;
-    plot(ax.XLim,[Ns,Ns],'b-','LineWidth',1);
+    plot(ax.XLim,[Ps,Ps],'b-','LineWidth',1);
     plot([average,average],ax.YLim,'r-','LineWidth',2);
     plot([lb,lb],ax.YLim,'m-','LineWidth',1);
     plot([ub,ub],ax.YLim,'m-','LineWidth',1);
