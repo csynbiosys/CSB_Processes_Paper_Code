@@ -1,5 +1,5 @@
-function [average,lb,ub,drec,all] = credibleInterval2...
-    (data,alpha,numInterval,varargin)
+function [average,lb,ub,drec,all] = credibleInterval3...
+    (data,alpha,varargin)
 %generate the credible interval (Highest Posterior Density Region)based on
 %the given data and alpha value. The last parameter is the name of the
 %figure file, if the user want to have a record of this.
@@ -7,8 +7,7 @@ function [average,lb,ub,drec,all] = credibleInterval2...
 mind=min(data);
 maxd=max(data);
 numInterval=1000;
-d2=2*iqr(data)*length(data)^(-1/3);
-%d2=(0.75*length(data))^(-1/5);
+d2=(0.75*length(data))^(-1/5);
 %count with 1000 intervals
 x=linspace(mind,maxd,numInterval+1);
 d=x(2)-x(1);
@@ -56,7 +55,8 @@ if ~isempty(varargin)
     plot([ub,ub],ax.YLim,'m-','LineWidth',1);
     title({'Credible Interval (Highest Posterior Density Region)';
         ['(with Alpha=',num2str(alpha),')']});
-    legend('Bootstrapped Results','Frequency Limit',...
+    legend('Histrogram','Kernel Density Estimation (rescaled)',...
+        'Frequency Limit',...
         ['Mean = ',num2str(average,'%10.3e')],...
         ['Lower Boundary = ',num2str(lb,'%10.3e')],...
         ['Upper Boundary = ',num2str(ub,'%10.3e')]);
