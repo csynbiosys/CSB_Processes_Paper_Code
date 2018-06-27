@@ -1,13 +1,13 @@
-function [average,lb,ub,drec] = credibleInterval6...
+function [average,lb,ub,drec] = credibleIntervalContinuous...
     (data,alpha,varargin)
-%generate the credible interval (Highest Posterior Density Region)based on
+%generate the credible interval (Highest Probability Density, HPD)based on
 %the given data and alpha value. The last parameter is the name of the
 %figure file, if the user want to have a record of this.
 %HDI with refine loop
 
 mind=min(data);
 maxd=max(data);
-numInterval=1000;
+numInterval=10000;
 dt=min(2*iqr(data)*length(data)^(-1/3),(maxd-mind)/20);
 d2=(0.75*length(data))^(-1/5);
 %count with 1000 intervals
@@ -57,11 +57,12 @@ average=mean(data);
 
 %draw the figure and save it if the user provide a file name.
 if ~isempty(varargin)
+    bins=linspace(mind,maxd,(maxd-mind)/(2*d2));
     figure();
-    histogram(data,mind:(2*d2):maxd);
+    histogram(data,bins);
     hold on;
     data2=data((data>=lb)&(data<=ub));
-    histogram(data2,mind:(2*d2):maxd);
+    histogram(data2,bins);
     plot(x,p*length(data)/d*2*d2);
     ax=gca;
     ax.XLim=[mind,maxd];

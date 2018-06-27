@@ -6,13 +6,15 @@ function [average,lb,ub,all] = credibleInterval5...
 
 mind=min(data);
 maxd=max(data);
-dt=min(2*iqr(data)*length(data)^(-1/3),(maxd-mind)/20);
-dt=(maxd-mind)/ceil((maxd-mind)/dt);
+dt=2*iqr(data)*length(data)^(-1/3);
 if (maxd-mind)/dt<20
     dt=(maxd-mind)/20;
 elseif (maxd-mind)/dt>40
     dt=(maxd-mind)/40;
+else
+    dt=(maxd-mind)/ceil((maxd-mind)/dt);
 end
+
 [p,x] = histcounts(data,linspace(mind,maxd,round((maxd-mind)/dt)));
 p=p/length(data);
 d=x(2)-x(1);
@@ -39,9 +41,8 @@ if ~isempty(varargin)
     figure();
     histogram(data,linspace(mind,maxd,round((maxd-mind)/dt)));
     hold on;
-    data2=arrayfun(@(x) (min(abs(all-(x+d/2)))<=d/1.99)*x,data);
+    data2=data(arrayfun(@(x) (min((all-(x+d/2)).^2)<=(d/2)^2),data));
     histogram(data2,linspace(mind,maxd,round((maxd-mind)/dt)));
-    plot(x(1,end-1)+d/2,p*length(data)/d*dt);
     ax=gca;
     plot(ax.XLim,[Ps,Ps],'b-','LineWidth',1);
     plot([average,average],ax.YLim,'r-','LineWidth',2);
@@ -55,7 +56,6 @@ if ~isempty(varargin)
             ['(with Alpha=',num2str(alpha),')'];varargin{1}});
     end
     legend('Histrogram','Values in the HPDR',...
-        'Kernel Density Estimation (rescaled)',...
         'Frequency Limit',...
         ['Mean = ',num2str(average,'%10.3e')],...
         ['Lower Boundary = ',num2str(lb,'%10.3e')],...

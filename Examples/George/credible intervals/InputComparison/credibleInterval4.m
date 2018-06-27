@@ -15,7 +15,7 @@ x=linspace(mind,maxd,numInterval+1);
 d=x(2)-x(1);
 drec=nan(20,1);
 ratio=3/(sqrt(125)*length(data));
-for count=1:20
+for count=1:19
     p=ksdensity(data,x,'Bandwidth',d2,'Kernel','epanechnikov');
     p=[0,p/sum(p),0];
     M=sum(diff(p,2).^2)/d^3;
@@ -29,20 +29,20 @@ end
 if (maxd-mind)/d2<20
     d2=min(min(drec(1)),dt);
 end
-if (maxd-mind)/d2>40
-    d2=(maxd-mind)/40;
-end
+
+drec(count+1)=d2;
 p=ksdensity(data,x,'Bandwidth',d2,'Kernel','epanechnikov');
 p=p/sum(p);
 
 [sorted,map]=sort(p,'descend');
 xt=x(map);
 all=xt(cumsum(sorted)<=(1-alpha));
+all=x(map(cumsum(sorted)<=(1-alpha)));
 
 %variable 'all' saves all the regions with the frequency larger than Ns.
 %e.g. if the region is [0.1,0.2],[0.2,0.3],[0.4,0.5], all would be:
 %all=[0.1,0.2,0.4]
-Ps=sorted(length(all))*length(data)/d*d2;
+Ps=sorted(length(all))*length(data)/d*2*d2;
 all=sort(all);
 lb=all(1);
 ub=all(end);
@@ -56,11 +56,11 @@ end
 %draw the figure and save it if the user provide a file name.
 if ~isempty(varargin)
     figure();
-    histogram(data,mind:d2:maxd);
+    histogram(data,mind:2*d2:maxd);
     hold on;
-    data2=arrayfun(@(x) (min((all-(x+d/2)).^2)<=(d)^2)*x,data);
-    histogram(data2,mind:d2:maxd);
-    plot(x,p*length(data)/d*d2);
+    data2=data(arrayfun(@(x) (min((all-x).^2)<=(d)^2),data));
+    histogram(data2,mind:2*d2:maxd);
+    plot(x,p*length(data)/d*2*d2);
     ax=gca;
     ax.XLim=[mind,maxd];
     plot(ax.XLim,[Ps,Ps],'b-','LineWidth',1);

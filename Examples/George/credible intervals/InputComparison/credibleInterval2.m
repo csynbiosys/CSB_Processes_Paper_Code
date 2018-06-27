@@ -1,5 +1,5 @@
 function [average,lb,ub,drec,all] = credibleInterval2...
-    (data,alpha,numInterval,varargin)
+    (data,alpha,varargin)
 %generate the credible interval (Highest Posterior Density Region)based on
 %the given data and alpha value. The last parameter is the name of the
 %figure file, if the user want to have a record of this.
@@ -13,7 +13,7 @@ d2=2*iqr(data)*length(data)^(-1/3);
 x=linspace(mind,maxd,numInterval+1);
 d=x(2)-x(1);
 drec=nan(20,1);
-for count=1:20
+for count=1:19
     p=ksdensity(data,x,'Bandwidth',d2,'Kernel','epanechnikov');
     p=p/sum(p);
     pt=[0,p,0];
@@ -24,7 +24,7 @@ for count=1:20
         break;
     end
 end
-
+drec(count+1)=d2;
 [sorted,map]=sort(p,'descend');
 xt=x(map);
 all=xt(cumsum(sorted)<=(1-alpha));
