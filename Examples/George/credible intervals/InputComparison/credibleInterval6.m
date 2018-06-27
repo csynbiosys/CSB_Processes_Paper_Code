@@ -17,9 +17,7 @@ drec=nan(20,1);
 ratio=3/(sqrt(125)*length(data));
 for count=1:20
     p=ksdensity(data,x,'Bandwidth',d2,...
-        'Kernel','epanechnikov',...
-        'Support','positive',...
-        'BoundaryCorrection','reflection');
+        'Kernel','epanechnikov');
     p=[0,p/sum(p),0];
     M=sum(diff(p,2).^2)/d^3;
     drec(count)=d2;
@@ -33,9 +31,7 @@ if (maxd-mind)/d2<20
     d2=min(min(drec(1)),dt);
 end
 p=ksdensity(data,x,'Bandwidth',d2,...
-    'Kernel','epanechnikov',...
-    'Support','positive',...
-    'BoundaryCorrection','reflection');
+    'Kernel','epanechnikov');
 p=p/sum(p);
 cp=cumsum(p);
 a=[0,cp(cp<=alpha)];
@@ -87,7 +83,7 @@ if ~isempty(varargin)
     xlabel('Parameter Values');
     ylabel('Frequency');
     set(ax,'FontSize',14);
-    cosavefig(varargin{1});
+    savefig(varargin{1});
     hold off;
 end
 end
