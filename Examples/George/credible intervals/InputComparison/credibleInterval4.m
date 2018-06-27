@@ -3,6 +3,7 @@ function [average,lb,ub,drec,all] = credibleInterval4...
 %generate the credible interval (Highest Posterior Density Region)based on
 %the given data and alpha value. The last parameter is the name of the
 %figure file, if the user want to have a record of this.
+%HDI with refine loop
 
 mind=min(data);
 maxd=max(data);
@@ -13,13 +14,13 @@ d2=(0.75*length(data))^(-1/5);
 x=linspace(mind,maxd,numInterval+1);
 d=x(2)-x(1);
 drec=nan(20,1);
+ratio=3/(sqrt(125)*length(data));
 for count=1:20
-    p=ksdensity(data,x,'Bandwidth',d2,'Kernel','epanechnikov','BoundaryCorrection','reflection');
-    p=p/sum(p);
-    pt=[0,p,0];
-    M=sum((pt(1:end-2)+pt(3:end)-2*pt(2:end-1)).^2)/d^3;
+    p=ksdensity(data,x,'Bandwidth',d2,'Kernel','epanechnikov');
+    p=[0,p/sum(p),0];
+    M=sum(diff(p,2).^2)/d^3;
     drec(count)=d2;
-    d2=(3/(sqrt(125)*length(data)*M))^(1/5);
+    d2=(ratio*M)^(1/5);
     if abs(drec(count)-d2)<(d/100)
         break;
     end
@@ -31,7 +32,7 @@ end
 if (maxd-mind)/d2>40
     d2=(maxd-mind)/40;
 end
-p=ksdensity(data,x,'Bandwidth',d2,'Kernel','epanechnikov','BoundaryCorrection','reflection');
+p=ksdensity(data,x,'Bandwidth',d2,'Kernel','epanechnikov');
 p=p/sum(p);
 
 [sorted,map]=sort(p,'descend');
@@ -61,16 +62,17 @@ if ~isempty(varargin)
     histogram(data2,mind:d2:maxd);
     plot(x,p*length(data)/d*d2);
     ax=gca;
+    ax.XLim=[mind,maxd];
     plot(ax.XLim,[Ps,Ps],'b-','LineWidth',1);
     plot([average,average],ax.YLim,'r-','LineWidth',2);
     plot([lb,lb],ax.YLim,'m-','LineWidth',1);
     plot([ub,ub],ax.YLim,'m-','LineWidth',1);
     try
         title({'Credible Interval (Highest Posterior Density Region)';
-        ['(with Alpha=',num2str(alpha),')'];varargin{1}(1:11)});
+            ['(with Alpha=',num2str(alpha),')'];varargin{1}(1:11)});
     catch
         title({'Credible Interval (Highest Posterior Density Region)';
-        ['(with Alpha=',num2str(alpha),')'];varargin{1}});
+            ['(with Alpha=',num2str(alpha),')'];varargin{1}});
     end
     legend('Histrogram','Values in the HPDR',...
         'Kernel Density Estimation (rescaled)',...
