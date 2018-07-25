@@ -45,26 +45,30 @@ for iexp=1:nofExp
             repeati=difftimei/step(iexp);
             values{iexp}=[];
             for i=1:length(repeati)
-                values{iexp}=cat(2,values{iexp},repmat(inputs.exps.u{iexp}(i),1,repeati(i)));
+                values{iexp}=[values{iexp},...
+                    repmat(inputs.exps.u{iexp}(i),1,repeati(i))];
             end
         case 'pulse-up'
             timei=inputs.exps.t_con{iexp}*timeScale;
             step(iexp)=localGcd(diff(timei));
             repeati=diff(timei(1:3))/step(iexp);
-            values{iexp}=cat(2,repmat(inputs.exps.u_min{iexp},1,repeati(1)),...
-                repmat(inputs.exps.u_max{iexp},1,repeati(2)));
+            values{iexp}=[repmat(inputs.exps.u_min{iexp},1,repeati(1)),...
+                repmat(inputs.exps.u_max{iexp},1,repeati(2))];
             values{iexp}=repmat(values{iexp},1,inputs.exps.n_pulses{iexp});
         case 'pulse-down'
             timei=inputs.exps.t_con{iexp}*timeScale;
             step(iexp)=localGcd(diff(timei));
             repeati=diff(timei(1:3))/step(iexp);
-            values{iexp}=cat(2,repmat(inputs.exps.u_max{iexp},1,repeati(1)),...
-                repmat(inputs.exps.u_min{iexp},1,repeati(2)));
+            values{iexp}=[repmat(inputs.exps.u_max{iexp},1,repeati(1)),...
+                repmat(inputs.exps.u_min{iexp},1,repeati(2))];
             values{iexp}=repmat(values{iexp},1,inputs.exps.n_pulses{iexp});
         otherwise %linear case by default
             timei1=inputs.exps.t_con{iexp}*timeScale;
-            step(iexp)=min(d/100,localGcd(cat(2,timei1,inputs.exps.t_s{iexp}*timeScale)));
-            values{iexp}=interp1(timei1,inputs.exps.u{iexp},0:step(iexp):d);
+            step(iexp)=localGcd([timei1,inputs.exps.t_s{iexp}*timeScale]);
+            if (step(iexp)> timei1(end)/100)
+                step(iexp)=step(iexp)/ceil(step(iexp)/timei1(end)*100);
+            end
+            values{iexp}=interp1(timei1,inputs.exps.u{iexp},0:step(iexp):timei1(end));
     end
     command=[step(iexp),values{iexp}];
     if (nofExp==1)
@@ -78,7 +82,8 @@ cd(oldCd);
 end
 
 function n = localGcd( n )
-while (length(n)>1)
-    n=gcd(n(1:ceil(end/2)),n(floor(end/2+1):end));
-end
+n=gcd(sym(n));
+% while (length(n)>1)
+%     n=gcd(n(1:ceil(end/2)),n(floor(end/2+1):end));
+% end
 end
