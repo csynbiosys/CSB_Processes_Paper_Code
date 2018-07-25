@@ -114,7 +114,7 @@ for Time=1:Experiment_Length
     ys(Time+1)=(yhat_out(Time+1)+LP_out(Time))/Normalize_Factor_IRMA;
     %ys(Time+1)=(yhat_out(Time+1))/Normalize_Factor_IRMA;
     %% Send input to actuators
-    %{
+    %%{
     Gal_Axis=1;
     Glu_Axis=2;
     if (u(Time)==1)
@@ -131,7 +131,7 @@ for Time=1:Experiment_Length
     ysimout(Time+1)=Forward_Sim.y(1,end);    
     %% Some loop to insure the Experiment "Time" loop runs every 1min
     fprintf('Experiment Time = %d min\n',Time);
-    %{
+    %%{
     while(Elapsed_Time<20)
         Current_Loop_Execution=clock;
         Elapsed_Time=etime(Current_Loop_Execution,Last_Loop_Execution);
