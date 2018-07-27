@@ -241,7 +241,7 @@ end
 
 function result=mystrcmp(a,b)
 if (iscell(b))
-    result=max(cellarray(@(bsub) mystrcmp(a,bsub),b));
+    result=max(cellfun(@(bsub) mystrcmp(a,bsub),b));
 elseif (length(a)==length(b))
     result=min(a==b);
 else
