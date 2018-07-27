@@ -1,0 +1,4 @@
+Undefined function 'fit_to_InduciblePromoter_Optimised_valuesOnly' for input arguments of type 'char'.
+
+Error in run_in_silico_experiment_parfor_Optimised (line 51)
+            [out]=fit_to_InduciblePromoter_Optimised_valuesOnly(epccOutputResultFileNameBase,epccNumLoops,stepd,epcc_exps,global_theta_guess,globalSolv,localSolv,CR,F,strategy,pf);
