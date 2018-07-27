@@ -125,7 +125,7 @@ for i=1:numLoops
     inputs.nlpsol.nlpsolver='eSS';
     inputs.nlpsol.eSS.maxeval = 5e4;
     inputs.nlpsol.eSS.maxtime = 6e3*5;
-    inputs.nlpsol.eSS.local.solver = 'fminsearch'; % note that, in order to handle constraints, an SQP approach is required (e.g. fminsearch cannot be used).
+    inputs.nlpsol.eSS.local.solver = 'fmincon'; % note that, in order to handle constraints, an SQP approach is required (e.g. fminsearch cannot be used).
     inputs.nlpsol.eSS.local.finish = 'fmincon';%fmincon';
     
     inputs.nlpsol.eSS.local.nl2sol.maxiter  =     300;     % max number of iteration
@@ -136,7 +136,7 @@ for i=1:numLoops
     inputs.pathd.results_folder = results_folder;
     inputs.pathd.short_name     = short_name;
     inputs.pathd.runident       = strcat('oed-',int2str(i));
-   
+    AMIGO_Prep(inputs);
     warning('off');
     if (numLoops~=1)
         results{i}=AMIGO_OED(inputs);

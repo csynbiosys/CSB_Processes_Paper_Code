@@ -1,4 +1,4 @@
 
-results = OEDlhseSS(15,1,2);
+results = OEDlhseSS(3,1,2);
 
 save('test.mat','results');
